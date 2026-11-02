@@ -1,0 +1,14 @@
+# зависимости и сборки
+node_modules/
+desktop/build/
+desktop/relay/
+dist/
+
+# Android-проект создаётся командой `npx cap add android` (в том числе в GitHub Actions)
+mobile/android/
+mobile/ios/
+
+# прочее
+*.log
+.DS_Store
+Thumbs.db

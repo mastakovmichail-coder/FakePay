@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self'; script-src 'self'; connect-src ws: wss:;" />
+  <title>FakePay POS</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="logo">₽</span>
+      <div>
+        <h1>FakePay POS</h1>
+        <p>Симулятор эквайринга · все платежи ненастоящие</p>
+      </div>
+    </div>
+    <div class="status" id="status"><i class="dot"></i><span id="statusText">Не подключено</span></div>
+  </header>
+
+  <main class="grid">
+    <!-- Подключение -->
+    <section class="card" id="connectCard">
+      <h2>1. Терминал</h2>
+      <label>Адрес сервера
+        <input id="serverUrl" type="text" spellcheck="false" placeholder="ws://localhost:8787" />
+      </label>
+      <label>Код терминала (из приложения на телефоне)
+        <input id="codeInput" class="code" type="text" inputmode="numeric" maxlength="7"
+               placeholder="000 000" autocomplete="off" />
+      </label>
+      <button id="connectBtn" class="btn primary">Подключиться</button>
+      <p class="hint" id="connectHint">Откройте приложение-терминал — код создаётся при каждом запуске.</p>
+    </section>
+
+    <!-- Оплата -->
+    <section class="card pay" id="payCard">
+      <h2>2. Оплата</h2>
+      <div class="amountWrap">
+        <input id="amount" type="text" inputmode="decimal" placeholder="0.00" autocomplete="off" />
+        <select id="currency">
+          <option>RUB</option><option>EUR</option><option>PLN</option><option>USD</option>
+        </select>
+      </div>
+      <div class="quick" id="quick">
+        <button data-v="100">100</button>
+        <button data-v="500">500</button>
+        <button data-v="1000">1 000</button>
+        <button data-v="2500">2 500</button>
+        <button data-v="5000">5 000</button>
+      </div>
+      <div class="row">
+        <button id="payBtn" class="btn pay-btn" disabled>Оплатить</button>
+        <button id="cancelBtn" class="btn ghost" disabled>Отмена</button>
+      </div>
+      <div class="stats">
+        <div><b id="statOk">0</b><span>успешно</span></div>
+        <div><b id="statFail">0</b><span>отклонено</span></div>
+        <div><b id="statSum">0.00</b><span>принято всего</span></div>
+      </div>
+    </section>
+
+    <!-- Лог -->
+    <section class="card logCard">
+      <div class="logHead">
+        <div class="tabs">
+          <button id="tabLog" class="tab on">Журнал</button>
+          <button id="tabHist" class="tab">История</button>
+        </div>
+        <div class="acts">
+          <button id="exportCsv" class="btn tiny ghost" hidden>Экспорт CSV</button>
+          <button id="clearLog" class="btn tiny ghost">Очистить</button>
+        </div>
+      </div>
+      <div id="log" class="log" aria-live="polite"></div>
+      <div id="history" class="log hist" hidden></div>
+    </section>
+  </main>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

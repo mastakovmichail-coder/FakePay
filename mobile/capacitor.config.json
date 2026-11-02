@@ -1,0 +1,12 @@
+{
+  "appId": "local.fakepay.terminal",
+  "appName": "FakePay Терминал",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "http",
+    "cleartext": true
+  },
+  "android": {
+    "allowMixedContent": true
+  }
+}

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>FakePay Терминал</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand"><span class="logo">₽</span><b>FakePay Терминал</b></div>
+      <button id="gear" class="gear" aria-label="Настройки">⚙</button>
+    </header>
+
+    <!-- Экран 1: код терминала -->
+    <section id="sIdle" class="screen show">
+      <p class="lbl">Код терминала</p>
+      <div id="code" class="code">––– –––</div>
+      <p class="sub">Введите этот код в программе на компьютере</p>
+      <div class="pill" id="pill"><i></i><span id="pillText">Подключение к серверу…</span></div>
+      <p class="fine">Код создаётся заново при каждом запуске приложения. Платежи тестовые.</p>
+    </section>
+
+    <!-- Экран 2: запрос оплаты -->
+    <section id="sPay" class="screen">
+      <p class="lbl">К оплате</p>
+      <div id="amount" class="amount">0.00</div>
+      <button id="tap" class="tap" aria-label="Приложить карту">
+        <span class="ring r1"></span><span class="ring r2"></span>
+        <span class="card">💳</span>
+      </button>
+      <p id="nfcState" class="nfcState">NFC…</p>
+      <button id="decline" class="ghost">Отклонить</button>
+    </section>
+
+    <!-- Экран 3: обработка -->
+    <section id="sProc" class="screen">
+      <div class="spinner"></div>
+      <p class="sub big">Обработка платежа…</p>
+    </section>
+
+    <!-- Экран 4: результат -->
+    <section id="sDone" class="screen">
+      <div id="doneIcon" class="doneIcon">✓</div>
+      <h2 id="doneTitle">Оплата прошла успешно!</h2>
+      <p id="doneSub" class="sub"></p>
+    </section>
+
+    <div id="toast" class="toast"></div>
+  </div>
+
+  <!-- Настройки -->
+  <div id="sheet" class="sheet">
+    <div class="sheetBox">
+      <h3>Настройки</h3>
+      <label>Адрес сервера
+        <input id="serverUrl" type="text" spellcheck="false" autocapitalize="off" autocomplete="off"
+               placeholder="ws://192.168.1.10:8787" />
+      </label>
+      <p class="fine left">Тот же адрес, что и в программе на ПК. Для сервера в вашей Wi-Fi сети это IP компьютера.</p>
+      <label class="chk"><input id="nfcToggle" type="checkbox" checked /> Оплата по NFC (любое касание)</label>
+      <label>Случайные отказы, % (для тестов)
+        <input id="failRate" type="number" min="0" max="100" step="1" value="0" inputmode="numeric" />
+      </label>
+      <div class="rowBtns">
+        <button id="saveCfg" class="primary">Сохранить</button>
+        <button id="closeCfg" class="ghost">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

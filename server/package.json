@@ -1,0 +1,13 @@
+{
+  "name": "fakepay-server",
+  "version": "1.0.0",
+  "description": "Релей-сервер для симулятора эквайринга (фейковые платежи), без зависимостей",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test.js"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
