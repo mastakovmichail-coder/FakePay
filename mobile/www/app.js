@@ -53,18 +53,38 @@
   const nfc = { plugin: null, listener: null, webAbort: null };
 
   function nfcPlugin() {
+    if (nfc.plugin) return nfc.plugin;
+    const C = globalThis.Capacitor;
+    if (!C) return null;
+    // 1) Без сборщика нативные плагины доступны как Capacitor.Plugins.<Имя>
     try {
-      const C = globalThis.Capacitor;
-      if (C && C.isPluginAvailable && C.isPluginAvailable("NfcTap")) {
-        return nfc.plugin || (nfc.plugin = C.registerPlugin("NfcTap"));
+      const p = C.Plugins && C.Plugins.NfcTap;
+      if (p && typeof p.start === "function") return (nfc.plugin = p);
+    } catch { /* пробуем дальше */ }
+    // 2) Через registerPlugin (если он есть в этой версии моста)
+    try {
+      if (typeof C.registerPlugin === "function" &&
+          (typeof C.isPluginAvailable !== "function" || C.isPluginAvailable("NfcTap"))) {
+        return (nfc.plugin = C.registerPlugin("NfcTap"));
       }
-    } catch { /* нет плагина */ }
+    } catch { /* плагина нет */ }
     return null;
+  }
+
+  // Запущено внутри APK (Capacitor), а не в обычном браузере?
+  function insideApp() {
+    const C = globalThis.Capacitor;
+    if (!C) return false;
+    try {
+      if (typeof C.isNativePlatform === "function") return !!C.isNativePlatform();
+      if (typeof C.getPlatform === "function") return C.getPlatform() !== "web";
+    } catch { /* ignore */ }
+    return !!C.PluginHeaders;
   }
 
   function setNfcLabel(kind, extra) {
     const texts = {
-      on: "NFC активен — поднесите карту или телефон",
+      on: "NFC активен — поднесите карту или телефон" + (extra ? ` (${extra})` : ""),
       none: "NFC недоступен — нажмите на карту на экране",
       off: "NFC отключён в настройках приложения",
       err: extra || "Не удалось включить NFC",
@@ -81,13 +101,23 @@
       try {
         if (!nfc.listener) nfc.listener = await p.addListener("tag", onTap);
         await p.start();
-        setNfcLabel("on");
+        setNfcLabel("on", "нативный");
       } catch (e) {
-        setNfcLabel("err", (e && e.message) || undefined);
+        const msg = (e && (e.message || e.errorMessage)) || "";
+        setNfcLabel("err", msg ? `${msg}. Нажмите на карту на экране` : undefined);
       }
       return;
     }
 
+    // Внутри APK Web NFC не работает (WebView не показывает запрос разрешения),
+    // поэтому на него не откатываемся, а говорим, чего не хватает.
+    if (insideApp()) {
+      return setNfcLabel("err",
+        "NFC-плагин не найден в этой сборке APK — пересоберите его (setup-android.js). " +
+        "Пока нажимайте на карту на экране");
+    }
+
+    // Обычный браузер (Chrome на Android, https): Web NFC
     if ("NDEFReader" in globalThis) {
       try {
         nfc.webAbort = new AbortController();
@@ -95,9 +125,9 @@
         await reader.scan({ signal: nfc.webAbort.signal });
         reader.onreading = onTap;
         reader.onreadingerror = onTap; // любая метка, даже не NDEF
-        setNfcLabel("on");
+        setNfcLabel("on", "браузер");
       } catch (e) {
-        setNfcLabel("err", (e && e.message) || undefined);
+        setNfcLabel("err", "Браузер не дал доступ к NFC. Нажмите на карту на экране");
       }
       return;
     }
